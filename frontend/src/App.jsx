@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav.jsx';
 import Home from './pages/Home.jsx';
 import Professores from './pages/Professores.jsx';
+import Materias from './pages/Materias.jsx';
 import Salas from './pages/Salas.jsx';
 import Tempos from './pages/Tempos.jsx';
 import Turmas from './pages/Turmas.jsx';
@@ -14,6 +15,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/professores" element={<Professores />} />
+          <Route path="/materias" element={<Materias />} />
           <Route path="/salas" element={<Salas />} />
           <Route path="/tempos" element={<Tempos />} />
           <Route path="/turmas" element={<Turmas />} />

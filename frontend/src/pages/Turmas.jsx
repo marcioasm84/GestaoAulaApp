@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 
-const emptyForm = { nome: '', professorId: '', salaId: '', tempoId: '' };
+const emptyForm = { nome: '', professorId: '', materiaId: '', salaId: '', tempoId: '' };
 
 export default function Turmas() {
   const [turmas, setTurmas] = useState([]);
   const [professores, setProfessores] = useState([]);
+  const [materias, setMaterias] = useState([]);
   const [salas, setSalas] = useState([]);
   const [tempos, setTempos] = useState([]);
   const [form, setForm] = useState(emptyForm);
@@ -13,14 +14,16 @@ export default function Turmas() {
 
   async function loadAll() {
     try {
-      const [t, p, s, h] = await Promise.all([
+      const [t, p, m, s, h] = await Promise.all([
         api.listTurmas(),
         api.listProfessores(),
+        api.listMaterias(),
         api.listSalas(),
         api.listTempos(),
       ]);
       setTurmas(t);
       setProfessores(p);
+      setMaterias(m);
       setSalas(s);
       setTempos(h);
     } catch (e) {
@@ -31,6 +34,17 @@ export default function Turmas() {
   useEffect(() => {
     loadAll();
   }, []);
+
+  const professorSelecionado = professores.find((p) => p.id === Number(form.professorId));
+  const materiasDisponiveis =
+    professorSelecionado && professorSelecionado.materias.length > 0 ? professorSelecionado.materias : materias;
+
+  function handleProfessorChange(professorId) {
+    const professor = professores.find((p) => p.id === Number(professorId));
+    const materiaAindaValida =
+      professor && professor.materias.some((m) => m.id === Number(form.materiaId));
+    setForm({ ...form, professorId, materiaId: materiaAindaValida ? form.materiaId : '' });
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -58,7 +72,8 @@ export default function Turmas() {
     return tempo ? `${tempo.diaSemana} ${tempo.horaInicio}-${tempo.horaFim}` : '';
   }
 
-  const semCadastros = professores.length === 0 || salas.length === 0 || tempos.length === 0;
+  const semCadastros =
+    professores.length === 0 || materias.length === 0 || salas.length === 0 || tempos.length === 0;
 
   return (
     <section>
@@ -66,7 +81,7 @@ export default function Turmas() {
       {error && <p className="error">{error}</p>}
       {semCadastros && (
         <p className="hint">
-          Cadastre ao menos um professor, uma sala e um tempo antes de criar uma turma.
+          Cadastre ao menos um professor, uma matéria, uma sala e um tempo antes de criar uma turma.
         </p>
       )}
 
@@ -79,13 +94,28 @@ export default function Turmas() {
           Professor
           <select
             value={form.professorId}
-            onChange={(e) => setForm({ ...form, professorId: e.target.value })}
+            onChange={(e) => handleProfessorChange(e.target.value)}
             required
           >
             <option value="">Selecione</option>
             {professores.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.nome}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Matéria
+          <select
+            value={form.materiaId}
+            onChange={(e) => setForm({ ...form, materiaId: e.target.value })}
+            required
+          >
+            <option value="">Selecione</option>
+            {materiasDisponiveis.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.nome}
               </option>
             ))}
           </select>
@@ -124,6 +154,7 @@ export default function Turmas() {
           <tr>
             <th>Nome</th>
             <th>Professor</th>
+            <th>Matéria</th>
             <th>Sala</th>
             <th>Tempo</th>
             <th>Ações</th>
@@ -134,16 +165,19 @@ export default function Turmas() {
             <tr key={t.id}>
               <td>{t.nome}</td>
               <td>{t.professor?.nome}</td>
+              <td>{t.materia?.nome}</td>
               <td>{t.sala?.nome}</td>
               <td>{tempoLabel(t.tempo)}</td>
               <td>
-                <button onClick={() => handleDelete(t.id)}>Excluir</button>
+                <button className="btn-danger" onClick={() => handleDelete(t.id)}>
+                  Excluir
+                </button>
               </td>
             </tr>
           ))}
           {turmas.length === 0 && (
             <tr>
-              <td colSpan={5}>Nenhuma turma cadastrada.</td>
+              <td colSpan={6}>Nenhuma turma cadastrada.</td>
             </tr>
           )}
         </tbody>
