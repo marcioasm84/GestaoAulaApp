@@ -1,0 +1,25 @@
+services:
+  api:
+    build:
+      context: ./backend
+    environment:
+      PORT: "3000"
+    volumes:
+      - api_data:/data
+    expose:
+      - "3000"
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        BASE_PATH: ${BASE_PATH:-/}
+    environment:
+      BASE_PATH: ${BASE_PATH:-/}
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  api_data:
