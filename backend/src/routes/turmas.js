@@ -12,6 +12,7 @@ function enrich(turma) {
   return {
     ...turma,
     professor: findById('professores', turma.professorId) || null,
+    materia: findById('materias', turma.materiaId) || null,
     sala: findById('salas', turma.salaId) || null,
     tempo: findById('tempos', turma.tempoId) || null,
   };
@@ -31,11 +32,12 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { nome, professorId, salaId, tempoId } = req.body;
-  if (!nome || !professorId || !salaId || !tempoId) {
-    return res.status(400).json({ error: 'nome, professorId, salaId e tempoId são obrigatórios' });
+  const { nome, professorId, materiaId, salaId, tempoId } = req.body;
+  if (!nome || !professorId || !materiaId || !salaId || !tempoId) {
+    return res.status(400).json({ error: 'nome, professorId, materiaId, salaId e tempoId são obrigatórios' });
   }
   if (!findById('professores', professorId)) return res.status(400).json({ error: 'professor inválido' });
+  if (!findById('materias', materiaId)) return res.status(400).json({ error: 'matéria inválida' });
   if (!findById('salas', salaId)) return res.status(400).json({ error: 'sala inválida' });
   if (!findById('tempos', tempoId)) return res.status(400).json({ error: 'tempo inválido' });
 
@@ -43,6 +45,7 @@ router.post('/', (req, res) => {
   const dados = {
     nome,
     professorId: Number(professorId),
+    materiaId: Number(materiaId),
     salaId: Number(salaId),
     tempoId: Number(tempoId),
   };
@@ -62,14 +65,16 @@ router.put('/:id', (req, res) => {
   const index = items.findIndex((i) => i.id === id);
   if (index === -1) return res.status(404).json({ error: 'turma não encontrada' });
 
-  const { nome, professorId, salaId, tempoId } = req.body;
+  const { nome, professorId, materiaId, salaId, tempoId } = req.body;
   const dados = {
     nome: nome ?? items[index].nome,
     professorId: professorId !== undefined ? Number(professorId) : items[index].professorId,
+    materiaId: materiaId !== undefined ? Number(materiaId) : items[index].materiaId,
     salaId: salaId !== undefined ? Number(salaId) : items[index].salaId,
     tempoId: tempoId !== undefined ? Number(tempoId) : items[index].tempoId,
   };
   if (!findById('professores', dados.professorId)) return res.status(400).json({ error: 'professor inválido' });
+  if (!findById('materias', dados.materiaId)) return res.status(400).json({ error: 'matéria inválida' });
   if (!findById('salas', dados.salaId)) return res.status(400).json({ error: 'sala inválida' });
   if (!findById('tempos', dados.tempoId)) return res.status(400).json({ error: 'tempo inválido' });
   if (conflito(items, dados, id)) {

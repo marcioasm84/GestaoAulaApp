@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const professoresRouter = require('./src/routes/professores');
+const materiasRouter = require('./src/routes/materias');
 const salasRouter = require('./src/routes/salas');
 const temposRouter = require('./src/routes/tempos');
 const turmasRouter = require('./src/routes/turmas');
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/professores', professoresRouter);
+app.use('/api/materias', materiasRouter);
 app.use('/api/salas', salasRouter);
 app.use('/api/tempos', temposRouter);
 app.use('/api/turmas', turmasRouter);

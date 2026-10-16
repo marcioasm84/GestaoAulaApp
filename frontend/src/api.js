@@ -19,6 +19,11 @@ export const api = {
   updateProfessor: (id, data) => request(`professores/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteProfessor: (id) => request(`professores/${id}`, { method: 'DELETE' }),
 
+  listMaterias: () => request('materias'),
+  createMateria: (data) => request('materias', { method: 'POST', body: JSON.stringify(data) }),
+  updateMateria: (id, data) => request(`materias/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteMateria: (id) => request(`materias/${id}`, { method: 'DELETE' }),
+
   listSalas: () => request('salas'),
   createSala: (data) => request('salas', { method: 'POST', body: JSON.stringify(data) }),
   updateSala: (id, data) => request(`salas/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
